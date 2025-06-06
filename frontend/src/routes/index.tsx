@@ -1,3 +1,4 @@
+import { A } from "@solidjs/router";
 import { Show } from "solid-js";
 import Button from "~/components/Button";
 import Icon from "~/components/Icon";
@@ -31,7 +32,9 @@ export default function Home() {
           </p>
           <div class="flex flex-col sm:flex-row gap-4 justify-center">
             <Button variant="primary" size="xl">
-              Get Started
+              <A href="/dashboard">
+                Get Started
+              </A>
             </Button>
           </div>
         </div>

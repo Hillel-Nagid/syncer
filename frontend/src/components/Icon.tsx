@@ -1,17 +1,30 @@
 import { JSX } from "solid-js";
 import type { IconName } from "~/types";
 import {
+    AppleMusicIcon,
+    ArrowLeftIcon,
     CalendarIcon,
+    ClockIcon,
+    DeezerIcon,
+    // Brand icons
+    GoogleCalendarIcon,
     GoogleIcon,
     LogoutIcon,
     MenuIcon,
     MoonIcon,
     MusicIcon,
+    OutlookIcon,
+    PlusIcon,
     RealtimeSyncIcon,
+    // Music Services
+    SpotifyIcon,
     SunIcon,
     SyncIcon,
+    TidalIcon,
+    TrashIcon,
     UserIcon,
-    VIcon
+    VIcon,
+    YouTubeIcon
 } from "./icons";
 
 interface IconProps {
@@ -32,6 +45,19 @@ const iconMap: Record<IconName, (props: { class?: string }) => JSX.Element> = {
     "logout-icon": LogoutIcon,
     "v-icon": VIcon,
     "google-icon": GoogleIcon,
+    "arrow-left": ArrowLeftIcon,
+    "clock-icon": ClockIcon,
+    "plus-icon": PlusIcon,
+    "trash-icon": TrashIcon,
+    // Calendar Services
+    "google-calendar-icon": GoogleCalendarIcon,
+    "outlook-icon": OutlookIcon,
+    // Music Services
+    "spotify-icon": SpotifyIcon,
+    "apple-music-icon": AppleMusicIcon,
+    "youtube-icon": YouTubeIcon,
+    "deezer-icon": DeezerIcon,
+    "tidal-icon": TidalIcon,
 };
 
 export default function Icon(props: IconProps): JSX.Element {

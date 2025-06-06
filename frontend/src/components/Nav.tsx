@@ -9,7 +9,7 @@ import UserProfile from "./UserProfile";
 const navLinks = [
   { href: "/", text: "Home" },
   { href: "/about", text: "About" },
-  { href: "/services", text: "Services" },
+  { href: "/dashboard", text: "Dashboard" },
   { href: "/faq", text: "FAQ" },
 ];
 
