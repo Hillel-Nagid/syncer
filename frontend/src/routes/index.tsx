@@ -102,7 +102,7 @@ export default function Home() {
           <Show
             when={isLoggedIn()}
             fallback={
-              <Button variant="primary" size="lg" onClick={handleDemoLogin}>
+              <Button variant="primary" size="lg" onClick={handleDemoLogin} class="justify-self-center">
                 Demo Login
               </Button>
             }
@@ -111,7 +111,7 @@ export default function Home() {
               <p class="text-lg text-slate-700 dark:text-slate-300">
                 Welcome back, {user()?.username}!
               </p>
-              <Button variant="secondary" size="lg" onClick={logout}>
+              <Button variant="secondary" size="lg" onClick={logout} class="justify-self-center">
                 Demo Logout
               </Button>
             </div>
@@ -127,7 +127,7 @@ export default function Home() {
           <p class="text-xl text-slate-600 dark:text-slate-400 mb-8">
             Join thousands of users who have simplified their digital workflow with Syncer.
           </p>
-          <Button variant="primary" size="lg">
+          <Button variant="primary" size="lg" class="justify-self-center-safe">
             Start Syncing Now
           </Button>
         </div>
