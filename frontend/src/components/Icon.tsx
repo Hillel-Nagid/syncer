@@ -2,12 +2,16 @@ import { JSX } from "solid-js";
 import type { IconName } from "~/types";
 import {
     CalendarIcon,
+    GoogleIcon,
+    LogoutIcon,
     MenuIcon,
     MoonIcon,
     MusicIcon,
     RealtimeSyncIcon,
     SunIcon,
-    SyncIcon
+    SyncIcon,
+    UserIcon,
+    VIcon
 } from "./icons";
 
 interface IconProps {
@@ -24,6 +28,10 @@ const iconMap: Record<IconName, (props: { class?: string }) => JSX.Element> = {
     "realtime-sync-icon": RealtimeSyncIcon,
     "sun-icon": SunIcon,
     "moon-icon": MoonIcon,
+    "user-icon": UserIcon,
+    "logout-icon": LogoutIcon,
+    "v-icon": VIcon,
+    "google-icon": GoogleIcon,
 };
 
 export default function Icon(props: IconProps): JSX.Element {

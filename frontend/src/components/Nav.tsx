@@ -1,8 +1,10 @@
 import { A, useLocation } from "@solidjs/router";
-import { createEffect, createSignal, For, onCleanup } from "solid-js";
-import MobileMenu from "./MobileMenu";
+import { createEffect, createSignal, For, onCleanup, Show } from "solid-js";
+import { useUser } from "~/contexts/UserContext";
 import Icon from "./Icon";
+import MobileMenu from "./MobileMenu";
 import ThemeToggle from "./ThemeToggle";
+import UserProfile from "./UserProfile";
 
 const navLinks = [
   { href: "/", text: "Home" },
@@ -13,6 +15,7 @@ const navLinks = [
 
 export default function Nav() {
   const location = useLocation();
+  const { isLoggedIn } = useUser();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = createSignal(false);
 
   const active = (path: string) =>
@@ -65,18 +68,23 @@ export default function Nav() {
               </div>
             </div>
 
-            {/* Theme Toggle & CTA Button */}
             <div class="hidden md:flex items-center space-x-4">
-              <ThemeToggle />
-              <a
-                href="/get-started"
-                class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-emerald-600 to-emerald-500 rounded-lg hover:from-emerald-700 hover:to-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-900 transition-all duration-200 shadow-md hover:shadow-lg"
+              <Show
+                when={isLoggedIn()}
+                fallback={
+                  <a
+                    href="/auth/signup"
+                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-emerald-600 to-emerald-500 rounded-lg hover:from-emerald-700 hover:to-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-900 transition-all duration-200 shadow-md hover:shadow-lg"
+                  >
+                    Sign Up
+                  </a>
+                }
               >
-                Get Started
-              </a>
+                <UserProfile />
+              </Show>
+              <ThemeToggle />
             </div>
 
-            {/* Mobile theme toggle and menu button */}
             <div class="md:hidden flex items-center space-x-2">
               <ThemeToggle />
               <button

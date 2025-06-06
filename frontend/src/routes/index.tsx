@@ -1,7 +1,19 @@
+import { Show } from "solid-js";
 import Button from "~/components/Button";
 import Icon from "~/components/Icon";
+import { useUser } from "~/contexts/UserContext";
 
 export default function Home() {
+  const { isLoggedIn, login, logout, user } = useUser();
+
+  const handleDemoLogin = () => {
+    login({
+      id: "demo-user",
+      username: "John Doe",
+      email: "john@example.com",
+      profilePicture: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
+    });
+  };
   const services = [
     "Google Calendar",
     "Spotify",
@@ -18,11 +30,8 @@ export default function Home() {
             Seamlessly synchronize your digital life. Connect calendars, music streaming services, and more with our powerful synchronization engine.
           </p>
           <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="primary">
+            <Button variant="primary" size="xl">
               Get Started
-            </Button>
-            <Button variant="secondary">
-              Learn More
             </Button>
           </div>
         </div>
@@ -79,6 +88,34 @@ export default function Home() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section class="py-20 px-4 bg-slate-50 dark:bg-slate-800/50">
+        <div class="max-w-4xl mx-auto text-center">
+          <h2 class="text-3xl md:text-4xl font-bold mb-6">
+            Demo Authentication
+          </h2>
+          <p class="text-xl text-slate-600 dark:text-slate-400 mb-8">
+            Test the authentication functionality by logging in and out.
+          </p>
+          <Show
+            when={isLoggedIn()}
+            fallback={
+              <Button variant="primary" size="lg" onClick={handleDemoLogin}>
+                Demo Login
+              </Button>
+            }
+          >
+            <div class="flex flex-col items-center space-y-4">
+              <p class="text-lg text-slate-700 dark:text-slate-300">
+                Welcome back, {user()?.username}!
+              </p>
+              <Button variant="secondary" size="lg" onClick={logout}>
+                Demo Logout
+              </Button>
+            </div>
+          </Show>
         </div>
       </section>
 
