@@ -9,6 +9,8 @@ import {
     // Brand icons
     GoogleCalendarIcon,
     GoogleIcon,
+    LightningIcon,
+    LockIcon,
     LogoutIcon,
     MenuIcon,
     MoonIcon,
@@ -25,7 +27,7 @@ import {
     UserIcon,
     VIcon,
     YouTubeIcon
-} from "./icons";
+} from "../icons";
 
 interface IconProps {
     name: IconName;
@@ -39,6 +41,8 @@ const iconMap: Record<IconName, (props: { class?: string }) => JSX.Element> = {
     "calendar-icon": CalendarIcon,
     "music-icon": MusicIcon,
     "realtime-sync-icon": RealtimeSyncIcon,
+    "lightning-icon": LightningIcon,
+    "lock-icon": LockIcon,
     "sun-icon": SunIcon,
     "moon-icon": MoonIcon,
     "user-icon": UserIcon,

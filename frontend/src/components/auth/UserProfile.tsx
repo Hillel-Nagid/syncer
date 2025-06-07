@@ -1,6 +1,6 @@
 import { createSignal, onCleanup, Show } from "solid-js";
 import { useUser } from "~/contexts/UserContext";
-import Icon from "./Icon";
+import Icon from "../ui/Icon";
 
 export default function UserProfile() {
     const { user, logout } = useUser();

@@ -1,5 +1,5 @@
 import { useTheme } from "~/contexts/ThemeContext";
-import Icon from "./Icon";
+import Icon from "../ui/Icon";
 
 export default function ThemeToggle() {
     const { theme, toggleTheme } = useTheme();

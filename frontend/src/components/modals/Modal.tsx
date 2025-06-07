@@ -1,5 +1,5 @@
 import { createEffect, JSX, onCleanup, Show } from "solid-js";
-import Icon from "./Icon";
+import Icon from "../ui/Icon";
 
 interface ModalProps {
     isOpen: () => boolean;

@@ -1,8 +1,8 @@
 import { createSignal, Show } from "solid-js";
-import Button from "~/components/Button";
-import CalendarDashboard from "~/components/CalendarDashboard";
-import Icon from "~/components/Icon";
-import MusicDashboard from "~/components/MusicDashboard";
+import CalendarDashboard from "~/components/dashboard/CalendarDashboard";
+import MusicDashboard from "~/components/dashboard/MusicDashboard";
+import Button from "~/components/ui/Button";
+import Icon from "~/components/ui/Icon";
 
 interface ServiceOption {
     id: string;

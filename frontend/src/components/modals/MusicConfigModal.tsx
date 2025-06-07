@@ -1,6 +1,6 @@
 import { createSignal, For } from "solid-js";
-import Button from "./Button";
-import Icon from "./Icon";
+import Button from "../ui/Button";
+import Icon from "../ui/Icon";
 import Modal from "./Modal";
 
 interface ServiceType {

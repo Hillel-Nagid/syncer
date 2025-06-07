@@ -1,10 +1,10 @@
 import { A, useLocation } from "@solidjs/router";
 import { createEffect, createSignal, For, onCleanup, Show } from "solid-js";
 import { useUser } from "~/contexts/UserContext";
-import Icon from "./Icon";
+import UserProfile from "../auth/UserProfile";
+import Icon from "../ui/Icon";
 import MobileMenu from "./MobileMenu";
 import ThemeToggle from "./ThemeToggle";
-import UserProfile from "./UserProfile";
 
 const navLinks = [
   { href: "/", text: "Home" },

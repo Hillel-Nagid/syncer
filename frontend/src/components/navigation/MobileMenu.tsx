@@ -1,7 +1,7 @@
 import { A } from "@solidjs/router";
 import { For, Show } from "solid-js";
 import { useUser } from "~/contexts/UserContext";
-import UserProfile from "./UserProfile";
+import UserProfile from "../auth/UserProfile";
 
 interface MobileMenuProps {
     isMobileMenuOpen: () => boolean;

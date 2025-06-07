@@ -1,10 +1,139 @@
 import { A } from "@solidjs/router";
 import { Show } from "solid-js";
-import Button from "~/components/Button";
-import Icon from "~/components/Icon";
+import Button from "~/components/ui/Button";
+import Card from "~/components/ui/Card";
+import Container from "~/components/ui/Container";
+import FeatureCard from "~/components/ui/FeatureCard";
+import Hero from "~/components/ui/Hero";
+import Icon from "~/components/ui/Icon";
 import { useUser } from "~/contexts/UserContext";
+import type { IconName } from "~/types";
 
-export default function Home() {
+// Hero Section Component
+function HeroSection() {
+  return (
+    <section class="relative bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-slate-900 dark:to-slate-800 py-20 px-4" >
+      <Container maxWidth="xl">
+        <Hero
+          title="Syncer"
+          subtitle="Seamlessly synchronize your digital life. Connect calendars, music streaming services, and more with our powerful synchronization engine."
+        />
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <Button variant="primary" size="xl">
+            <A href="/dashboard">
+              Get Started
+            </A>
+          </Button>
+        </div>
+      </Container>
+    </section>
+  );
+}
+
+// Features Section Component
+function FeaturesSection() {
+  return (
+    <section class="py-20">
+      <Container>
+        <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">
+          Sync Across Platforms
+        </h2>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <FeatureCard
+            icon="calendar-icon"
+            title="Calendar Sync"
+            description="Keep all your calendars in perfect sync across Google Calendar, Outlook, Apple Calendar, and more."
+          />
+          <FeatureCard
+            icon="music-icon"
+            title="Music Streaming"
+            description="Synchronize playlists, favorites, and listening history across Spotify, Apple Music, YouTube Music, and more."
+          />
+          <FeatureCard
+            icon="realtime-sync-icon"
+            title="Real-time Sync"
+            description="Changes are synchronized instantly across all your connected services with our real-time sync engine."
+          />
+        </div>
+      </Container>
+    </section>
+  );
+}
+
+// Supported Services Section Component
+function SupportedServicesSection() {
+  const services: { name: string; icon: IconName; description: string }[] = [
+    {
+      name: "Google Calendar",
+      icon: "google-calendar-icon" as const,
+      description: "Sync events and schedules"
+    },
+    {
+      name: "Spotify",
+      icon: "spotify-icon" as const,
+      description: "Sync playlists and music"
+    },
+    {
+      name: "Deezer",
+      icon: "deezer-icon" as const,
+      description: "Sync music library"
+    },
+    {
+      name: "Apple Music",
+      icon: "apple-music-icon" as const,
+      description: "Sync music and playlists"
+    },
+    {
+      name: "YouTube Music",
+      icon: "youtube-icon" as const,
+      description: "Sync music and subscriptions"
+    },
+    {
+      name: "Outlook Calendar",
+      icon: "outlook-icon" as const,
+      description: "Sync events and meetings"
+    },
+    {
+      name: "Tidal",
+      icon: "tidal-icon" as const,
+      description: "Sync high-quality music"
+    }
+  ];
+
+  return (
+    <section class="py-20 px-4 bg-slate-50 dark:bg-slate-800/50" >
+      <Container>
+        <div class="text-center">
+          <h2 class="text-3xl md:text-4xl font-bold mb-12">
+            Supported Services
+          </h2>
+          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {services.map((service) => (
+              <Card padding="md" class="group hover:shadow-xl hover:border-emerald-300 dark:hover:border-emerald-600 transition-all duration-300 hover:scale-105">
+                <div class="flex flex-col items-center text-center space-y-4">
+                  <div class="w-16 h-16 flex items-center justify-center bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/20 dark:to-emerald-800/20 rounded-2xl group-hover:from-emerald-100 group-hover:to-emerald-200 dark:group-hover:from-emerald-800/30 dark:group-hover:to-emerald-700/30 transition-all duration-300">
+                    <Icon name={service.icon} class="w-8 h-8" alt={`${service.name} Logo`} />
+                  </div>
+                  <div>
+                    <h3 class="font-semibold text-slate-900 dark:text-slate-100 mb-1">
+                      {service.name}
+                    </h3>
+                    <p class="text-sm text-slate-600 dark:text-slate-400">
+                      {service.description}
+                    </p>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </Container>
+    </section>
+  );
+}
+
+// Demo Authentication Section Component
+function DemoAuthSection() {
   const { isLoggedIn, login, logout, user } = useUser();
 
   const handleDemoLogin = () => {
@@ -15,87 +144,11 @@ export default function Home() {
       profilePicture: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
     });
   };
-  const services = [
-    "Google Calendar",
-    "Spotify",
-    "Deezer"
-  ]
+
   return (
-    <main class="text-slate-900 dark:text-slate-100">
-      <section class="relative bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-slate-900 dark:to-slate-800 py-20 px-4">
-        <div class="max-w-6xl mx-auto text-center">
-          <h1 class="text-5xl md:text-6xl font-bold text-emerald-600 dark:text-emerald-400 mb-6">
-            Syncer
-          </h1>
-          <p class="text-xl md:text-2xl text-slate-700 dark:text-slate-300 mb-8 max-w-3xl mx-auto">
-            Seamlessly synchronize your digital life. Connect calendars, music streaming services, and more with our powerful synchronization engine.
-          </p>
-          <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="primary" size="xl">
-              <A href="/dashboard">
-                Get Started
-              </A>
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      <section class="py-20 px-4">
-        <div class="max-w-6xl mx-auto">
-          <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">
-            Sync Across Platforms
-          </h2>
-          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
-              <div class="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg flex items-center justify-center mb-4">
-                <Icon name="calendar-icon" class="w-6 h-6 text-emerald-600 dark:text-emerald-400" alt="Calendar Icon" />
-              </div>
-              <h3 class="text-xl font-semibold mb-3">Calendar Sync</h3>
-              <p class="text-slate-600 dark:text-slate-400">
-                Keep all your calendars in perfect sync across Google Calendar, Outlook, Apple Calendar, and more.
-              </p>
-            </div>
-
-            <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
-              <div class="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg flex items-center justify-center mb-4">
-                <Icon name="music-icon" class="w-6 h-6 text-emerald-600 dark:text-emerald-400" alt="Music Icon" />
-              </div>
-              <h3 class="text-xl font-semibold mb-3">Music Streaming</h3>
-              <p class="text-slate-600 dark:text-slate-400">
-                Synchronize playlists, favorites, and listening history across Spotify, Apple Music, YouTube Music, and more.
-              </p>
-            </div>
-
-            <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
-              <div class="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg flex items-center justify-center mb-4">
-                <Icon name="realtime-sync-icon" class="w-6 h-6 text-emerald-600 dark:text-emerald-400" alt="Real-time Sync Icon" />
-              </div>
-              <h3 class="text-xl font-semibold mb-3">Real-time Sync</h3>
-              <p class="text-slate-600 dark:text-slate-400">
-                Changes are synchronized instantly across all your connected services with our real-time sync engine.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="py-20 px-4 bg-slate-50 dark:bg-slate-800/50">
-        <div class="max-w-6xl mx-auto text-center">
-          <h2 class="text-3xl md:text-4xl font-bold mb-12">
-            Supported Services
-          </h2>
-          <div class="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-3 gap-8 items-center">
-            {services.map((service) => (
-              <div class="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-md border border-slate-200 dark:border-slate-700">
-                <span class="text-sm font-medium text-slate-700 dark:text-slate-300">{service}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section class="py-20 px-4 bg-slate-50 dark:bg-slate-800/50">
-        <div class="max-w-4xl mx-auto text-center">
+    <section class="py-20 px-4 bg-slate-50 dark:bg-slate-800/50">
+      <Container maxWidth="lg">
+        <div class="text-center">
           <h2 class="text-3xl md:text-4xl font-bold mb-6">
             Demo Authentication
           </h2>
@@ -120,21 +173,73 @@ export default function Home() {
             </div>
           </Show>
         </div>
-      </section>
+      </Container>
+    </section>
+  );
+}
 
-      <section class="py-20 px-4">
-        <div class="max-w-4xl mx-auto text-center">
+// Call to Action Section Component
+function CallToActionSection() {
+  return (
+    <section class="py-20">
+      <Container maxWidth="lg">
+        <div class="text-center">
           <h2 class="text-3xl md:text-4xl font-bold mb-6">
             Ready to sync your digital life?
           </h2>
           <p class="text-xl text-slate-600 dark:text-slate-400 mb-8">
             Join thousands of users who have simplified their digital workflow with Syncer.
           </p>
-          <Button variant="primary" size="lg" class="justify-self-center-safe">
-            Start Syncing Now
+          <Button variant="primary" size="lg" class="justify-self-center">
+            <A href="/dashboard">
+              Start Syncing Now
+            </A>
           </Button>
         </div>
-      </section>
-    </main>
+      </Container>
+    </section>
+  );
+}
+
+// Footer Component
+function Footer() {
+  return (
+    <footer class="bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-300">
+      <div class="px-8 py-12 ">
+        {/* Bottom Section */}
+        <div class="border-t border-slate-200 dark:border-slate-700 flex flex-col md:flex-row justify-between items-center pt-8">
+          <p class="text-sm text-slate-500 dark:text-slate-400">
+            © 2025 Syncer. All rights reserved.
+          </p>
+          <div class="flex space-x-6 mt-4 md:mt-0">
+            <a href="#" class="text-sm text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+              Privacy
+            </a>
+            <a href="#" class="text-sm text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+              Terms
+            </a>
+            <a href="#" class="text-sm text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+              Cookies
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+// Main Home Component
+export default function Home() {
+  return (
+    <>
+      <main class="text-slate-900 dark:text-slate-100">
+        <HeroSection />
+        <FeaturesSection />
+        <SupportedServicesSection />
+        <CallToActionSection />
+        <DemoAuthSection />
+      </main>
+      <Footer />
+    </>
   );
 }

@@ -1,5 +1,5 @@
 import { JSX } from "solid-js";
-import SyncIcon from "./SyncIcon";
+import SyncIcon from "../SyncIcon";
 
 interface AuthLayoutProps {
     title: string;

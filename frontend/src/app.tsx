@@ -1,7 +1,7 @@
 import { Router } from "@solidjs/router";
 import { FileRoutes } from "@solidjs/start/router";
 import { Suspense } from "solid-js";
-import Nav from "~/components/Nav";
+import Nav from "~/components/navigation/Nav";
 import { ThemeProvider } from "~/contexts/ThemeContext";
 import { UserProvider } from "~/contexts/UserContext";
 import "./app.css";
