@@ -3,6 +3,7 @@ import CalendarDashboard from "~/components/dashboard/CalendarDashboard";
 import MusicDashboard from "~/components/dashboard/MusicDashboard";
 import Button from "~/components/ui/Button";
 import Icon from "~/components/ui/Icon";
+import Page from "~/components/ui/Page";
 
 interface ServiceOption {
     id: string;
@@ -49,7 +50,7 @@ export default function Dashboard() {
     };
 
     return (
-        <div class="min-h-screen w-full bg-gray-50 dark:bg-gray-900">
+        <Page>
             {/* Calendar Dashboard */}
             <Show when={selectedService() === "calendar"}>
                 <div class={`transition-opacity duration-300 ease-in-out ${isTransitioning() ? 'opacity-0' : 'opacity-100'
@@ -143,6 +144,6 @@ export default function Dashboard() {
                     <MusicDashboard onBack={handleBack} />
                 </div>
             </Show>
-        </div>
+        </Page>
     );
 }

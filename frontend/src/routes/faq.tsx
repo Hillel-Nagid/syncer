@@ -1,8 +1,11 @@
+import { A } from "@solidjs/router";
 import { Component, createSignal, For } from "solid-js";
+import Button from "~/components/ui/Button";
 import Card from "~/components/ui/Card";
-import Icon from "~/components/ui/Icon";
 import Container from "~/components/ui/Container";
 import Hero from "~/components/ui/Hero";
+import Icon from "~/components/ui/Icon";
+import Page from "~/components/ui/Page";
 
 // Reusable FAQ Item Component
 interface FAQItemProps {
@@ -156,7 +159,7 @@ const FAQ: Component = () => {
     ];
 
     return (
-        <div class="min-h-screen bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-slate-900 dark:to-slate-800 py-16 px-4 sm:px-6 lg:px-8">
+        <Page class="py-12 px-4 sm:px-6 lg:px-8">
             <Container>
                 <Hero
                     title="Frequently Asked Questions"
@@ -179,22 +182,15 @@ const FAQ: Component = () => {
                         Our support team is here to help you get the most out of Syncer.
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                        <a
-                            href="mailto:support@syncer.app"
-                            class="inline-flex items-center justify-center px-6 py-3 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-600 text-white font-semibold rounded-lg transition-colors duration-200"
-                        >
-                            Email Support
-                        </a>
-                        <a
-                            href="/contact"
-                            class="inline-flex items-center justify-center px-6 py-3 bg-white hover:bg-slate-50 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 font-semibold rounded-lg border border-slate-300 dark:border-slate-600 transition-colors duration-200"
-                        >
-                            Contact Form
-                        </a>
+                        <A href="/contact">
+                            <Button variant="primary" size="lg">
+                                Contact us
+                            </Button>
+                        </A>
                     </div>
                 </Card>
             </Container>
-        </div>
+        </Page>
     );
 };
 

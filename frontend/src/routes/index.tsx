@@ -6,6 +6,7 @@ import Container from "~/components/ui/Container";
 import FeatureCard from "~/components/ui/FeatureCard";
 import Hero from "~/components/ui/Hero";
 import Icon from "~/components/ui/Icon";
+import Page from "~/components/ui/Page";
 import { useUser } from "~/contexts/UserContext";
 import type { IconName } from "~/types";
 
@@ -19,11 +20,11 @@ function HeroSection() {
           subtitle="Seamlessly synchronize your digital life. Connect calendars, music streaming services, and more with our powerful synchronization engine."
         />
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button variant="primary" size="xl">
-            <A href="/dashboard">
+          <A href="/dashboard">
+            <Button variant="primary" size="xl">
               Get Started
-            </A>
-          </Button>
+            </Button>
+          </A>
         </div>
       </Container>
     </section>
@@ -190,48 +191,23 @@ function CallToActionSection() {
           <p class="text-xl text-slate-600 dark:text-slate-400 mb-8">
             Join thousands of users who have simplified their digital workflow with Syncer.
           </p>
-          <Button variant="primary" size="lg" class="justify-self-center">
-            <A href="/dashboard">
+          <A href="/dashboard">
+            <Button variant="primary" size="lg" class="justify-self-center">
               Start Syncing Now
-            </A>
-          </Button>
+            </Button>
+          </A>
         </div>
       </Container>
     </section>
   );
 }
 
-// Footer Component
-function Footer() {
-  return (
-    <footer class="bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-300">
-      <div class="px-8 py-12 ">
-        {/* Bottom Section */}
-        <div class="border-t border-slate-200 dark:border-slate-700 flex flex-col md:flex-row justify-between items-center pt-8">
-          <p class="text-sm text-slate-500 dark:text-slate-400">
-            © 2025 Syncer. All rights reserved.
-          </p>
-          <div class="flex space-x-6 mt-4 md:mt-0">
-            <a href="#" class="text-sm text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-              Privacy
-            </a>
-            <a href="#" class="text-sm text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-              Terms
-            </a>
-            <a href="#" class="text-sm text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-              Cookies
-            </a>
-          </div>
-        </div>
-      </div>
-    </footer>
-  );
-}
+
 
 // Main Home Component
 export default function Home() {
   return (
-    <>
+    <Page>
       <main class="text-slate-900 dark:text-slate-100">
         <HeroSection />
         <FeaturesSection />
@@ -239,7 +215,6 @@ export default function Home() {
         <CallToActionSection />
         <DemoAuthSection />
       </main>
-      <Footer />
-    </>
+    </Page>
   );
 }

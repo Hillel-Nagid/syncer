@@ -1,5 +1,6 @@
 import { JSX } from "solid-js";
 import SyncIcon from "../SyncIcon";
+import Page from "../ui/Page";
 
 interface AuthLayoutProps {
     title: string;
@@ -10,7 +11,7 @@ interface AuthLayoutProps {
 
 export default function AuthLayout(props: AuthLayoutProps) {
     return (
-        <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-slate-900 dark:to-slate-800">
+        <Page class="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
             <div class="max-w-md w-full space-y-8">
                 {/* Header */}
                 <div class="text-center">
@@ -39,6 +40,6 @@ export default function AuthLayout(props: AuthLayoutProps) {
                     </div>
                 )}
             </div>
-        </div>
+        </Page>
     );
 } 

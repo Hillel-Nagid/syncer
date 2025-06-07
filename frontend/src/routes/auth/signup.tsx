@@ -1,11 +1,11 @@
 import { A } from "@solidjs/router";
 import { createSignal } from "solid-js";
-import AuthLayout from "~/components/AuthLayout";
-import Button from "~/components/Button";
-import FormError from "~/components/FormError";
-import FormInput from "~/components/FormInput";
-import Icon from "~/components/Icon";
-import LoadingSpinner from "~/components/LoadingSpinner";
+import AuthLayout from "~/components/auth/AuthLayout";
+import Button from "~/components/ui/Button";
+import FormError from "~/components/forms/FormError";
+import FormInput from "~/components/forms/FormInput";
+import Icon from "~/components/ui/Icon";
+import LoadingSpinner from "~/components/ui/LoadingSpinner";
 
 export default function Signup() {
     const [formData, setFormData] = createSignal({

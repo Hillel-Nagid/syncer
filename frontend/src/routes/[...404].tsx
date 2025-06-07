@@ -1,8 +1,9 @@
 import { A } from "@solidjs/router";
+import Page from "~/components/ui/Page";
 
 export default function NotFound() {
   return (
-    <main class="min-h-screen flex flex-col items-center justify-center text-center mx-auto text-slate-900 dark:text-slate-100 p-4">
+    <Page class="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 text-center">
       <div class="max-w-md w-full">
         {/* Large 404 number */}
         <h1 class="text-8xl font-bold text-emerald-600 dark:text-emerald-400 mb-4">
@@ -30,6 +31,6 @@ export default function NotFound() {
           </A>
         </div>
       </div>
-    </main>
+    </Page>
   );
 }

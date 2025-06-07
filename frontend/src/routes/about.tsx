@@ -3,6 +3,7 @@ import Card from "~/components/ui/Card";
 import Container from "~/components/ui/Container";
 import FeatureCard from "~/components/ui/FeatureCard";
 import Hero from "~/components/ui/Hero";
+import Page from "~/components/ui/Page";
 import StepCard from "~/components/ui/StepCard";
 
 const About: Component = () => {
@@ -45,7 +46,7 @@ const About: Component = () => {
     ];
 
     return (
-        <div class="min-h-screen bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-slate-900 dark:to-slate-800 py-16 px-4 sm:px-6 lg:px-8">
+        <Page class="py-12 px-4 sm:px-6 lg:px-8">
             <Container>
                 {/* Header Section */}
                 <Hero
@@ -96,7 +97,7 @@ const About: Component = () => {
                     </Card>
                 </section>
             </Container>
-        </div>
+        </Page>
     );
 };
 
