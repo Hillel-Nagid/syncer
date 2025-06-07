@@ -103,7 +103,6 @@ export default function Contact() {
     return (
         <Page>
             <Container maxWidth="4xl" class="px-6 py-12">
-                {/* Header */}
                 <div class="text-center mb-12">
                     <h1 class="text-4xl font-bold text-slate-900 dark:text-slate-100 mb-4">
                         Get in Touch
@@ -117,7 +116,6 @@ export default function Contact() {
                 <div class="flex flex-col gap-8">
 
 
-                    {/* Contact Form */}
                     <div class="lg:col-span-2">
                         <Card>
                             <div class="p-8">
@@ -209,22 +207,6 @@ export default function Contact() {
                                 )}
                             </div>
                         </Card>
-                    </div>
-                </div>
-
-                {/* FAQ CTA Section */}
-                <div class="mt-16 text-center">
-                    <div class="bg-gradient-to-r from-emerald-500 to-emerald-600 dark:from-emerald-600 dark:to-emerald-700 rounded-2xl p-8">
-                        <h2 class="text-2xl font-bold text-white mb-4">
-                            Looking for Quick Answers?
-                        </h2>
-                        <p class="text-emerald-100 mb-6 max-w-2xl mx-auto">
-                            Our FAQ section covers the most common questions about synchronization,
-                            setup, troubleshooting, and supported services.
-                        </p>
-                        <Button variant="secondary" size="lg" class="bg-white text-emerald-600 hover:bg-emerald-50 justify-self-center">
-                            Browse FAQ
-                        </Button>
                     </div>
                 </div>
             </Container>
