@@ -10,12 +10,15 @@ import {
     GoogleCalendarIcon,
     GoogleIcon,
     LightningIcon,
+    LocationIcon,
     LockIcon,
     LogoutIcon,
+    MailIcon,
     MenuIcon,
     MoonIcon,
     MusicIcon,
     OutlookIcon,
+    PhoneIcon,
     PlusIcon,
     RealtimeSyncIcon,
     // Music Services
@@ -53,6 +56,10 @@ const iconMap: Record<IconName, (props: { class?: string }) => JSX.Element> = {
     "clock-icon": ClockIcon,
     "plus-icon": PlusIcon,
     "trash-icon": TrashIcon,
+    "mail-icon": MailIcon,
+    "location-icon": LocationIcon,
+    "phone-icon": PhoneIcon,
+
     // Calendar Services
     "google-calendar-icon": GoogleCalendarIcon,
     "outlook-icon": OutlookIcon,

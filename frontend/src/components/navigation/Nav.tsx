@@ -12,6 +12,7 @@ const navLinks = [
   { href: "/about", text: "About" },
   { href: "/dashboard", text: "Dashboard" },
   { href: "/faq", text: "FAQ" },
+  { href: "/contact", text: "Contact" },
 ];
 
 export default function Nav() {

@@ -100,15 +100,6 @@ export default function Contact() {
         }
     };
 
-    const contactInfo = [
-        {
-            icon: "mail-icon" as const,
-            title: "Email",
-            value: "support@syncer.app",
-            description: "Send us an email anytime"
-        },
-    ];
-
     return (
         <Page>
             <Container maxWidth="4xl" class="px-6 py-12">
@@ -203,7 +194,7 @@ export default function Contact() {
                                                 rows={6}
                                             />
 
-                                            <div class="flex justify-end">
+                                            <div class="flex justify-center">
                                                 <Button
                                                     type="submit"
                                                     icon="mail-icon"
@@ -218,30 +209,6 @@ export default function Contact() {
                                 )}
                             </div>
                         </Card>
-                    </div>
-                    {/* Contact Information */}
-                    <div class="flex flex-row gap-8 justify-center items-center w-4/5">
-                        <div class="space-y-6">
-                            {contactInfo.map((info) => (
-                                <div class="flex items-start space-x-4">
-                                    <div class="flex-shrink-0 w-12 h-12 bg-emerald-100 dark:bg-emerald-900/20 rounded-lg flex items-center justify-center">
-                                        <Icon name={info.icon} class="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
-                                    </div>
-                                    <div>
-                                        <h3 class="font-semibold text-slate-900 dark:text-slate-100 mb-1">
-                                            {info.title}
-                                        </h3>
-                                        <p class="text-slate-900 dark:text-slate-100 font-medium mb-1">
-                                            {info.value}
-                                        </p>
-                                        <p class="text-sm text-slate-600 dark:text-slate-400">
-                                            {info.description}
-                                        </p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-
                     </div>
                 </div>
 
