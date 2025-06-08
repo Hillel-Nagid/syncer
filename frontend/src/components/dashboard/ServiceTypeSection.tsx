@@ -1,13 +1,8 @@
 import Icon from "~/components/ui/Icon";
-import type { IconName } from "~/types";
-import ServiceInstanceCard, { type ServiceInstance } from "./ServiceInstanceCard";
+import type { ServiceInstance, ServiceType } from "~/types";
+import ServiceInstanceCard from "./ServiceInstanceCard";
 
-export interface ServiceType {
-    id: string;
-    name: string;
-    description: string;
-    icon: IconName;
-}
+
 
 interface ServiceTypeSectionProps {
     serviceType: ServiceType;

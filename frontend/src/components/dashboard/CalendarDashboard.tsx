@@ -1,5 +1,6 @@
 import { createSignal } from "solid-js";
-import { BaseDashboard, type ServiceInstance, type ServiceType } from "~/components/dashboard";
+import { BaseDashboard } from "~/components/dashboard";
+import type { ServiceInstance, ServiceType } from "~/types";
 import {
     CheckboxField,
     ConfigSection,
@@ -10,7 +11,7 @@ import {
 } from ".";
 import CalendarConfigModal from "../modals/CalendarConfigModal";
 
-interface CalendarConfig {
+type CalendarConfig = {
     serviceType: string;
     instanceName: string;
     syncFrequency: string;
@@ -23,7 +24,7 @@ interface CalendarService extends ServiceInstance {
     icon: "google-calendar-icon" | "outlook-icon";
 }
 
-interface CalendarDashboardProps {
+type CalendarDashboardProps = {
     onBack: () => void;
 }
 

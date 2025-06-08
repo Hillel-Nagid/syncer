@@ -35,3 +35,32 @@ export type User = {
 	email: string;
 	profilePicture?: string;
 };
+
+export type ServiceInstanceSyncSettings = {
+	frequency: string;
+	conflictResolution: string;
+};
+export interface ServiceInstance {
+	instanceId: string;
+	instanceName?: string;
+	name: string;
+	connected: boolean;
+	lastSync?: string;
+	syncSettings?: ServiceInstanceSyncSettings;
+}
+
+export type ServiceType = {
+	id: string;
+	name: string;
+	description: string;
+	icon: IconName;
+};
+
+export interface ServiceSpecificConfig {
+	[key: string]: any;
+}
+
+export interface ExtendedServiceInstanceSyncSettings
+	extends ServiceInstanceSyncSettings {
+	serviceSpecific?: ServiceSpecificConfig;
+}

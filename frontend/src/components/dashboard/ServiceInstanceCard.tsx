@@ -1,19 +1,8 @@
 import Button from "~/components/ui/Button";
 import Icon from "~/components/ui/Icon";
+import type { ServiceInstance } from "~/types";
 
-export interface ServiceInstanceSyncSettings {
-    frequency: string;
-    conflictResolution: string;
-}
 
-export interface ServiceInstance {
-    instanceId: string;
-    instanceName?: string;
-    name: string;
-    connected: boolean;
-    lastSync?: string;
-    syncSettings?: ServiceInstanceSyncSettings;
-}
 
 interface ServiceInstanceCardProps {
     service: ServiceInstance;

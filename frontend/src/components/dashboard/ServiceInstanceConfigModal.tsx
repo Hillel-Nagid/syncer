@@ -1,17 +1,10 @@
 import { createSignal, JSX, Show } from "solid-js";
+import type { ExtendedServiceInstanceSyncSettings, ServiceInstance, ServiceSpecificConfig } from "~/types";
 import Modal from "../modals/Modal";
 import Button from "../ui/Button";
 import Icon from "../ui/Icon";
-import type { ServiceInstance, ServiceInstanceSyncSettings } from "./ServiceInstanceCard";
 
 // Generic service-specific configuration type
-export interface ServiceSpecificConfig {
-    [key: string]: any;
-}
-
-export interface ExtendedServiceInstanceSyncSettings extends ServiceInstanceSyncSettings {
-    serviceSpecific?: ServiceSpecificConfig;
-}
 
 // Reusable form primitives
 export interface CheckboxFieldProps {

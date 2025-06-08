@@ -1,8 +1,7 @@
 import { JSX } from "solid-js";
-import type { IconName } from "~/types";
+import type { IconName, ServiceInstance, ServiceType } from "~/types";
 import DashboardHeader from "./DashboardHeader";
-import type { ServiceInstance } from "./ServiceInstanceCard";
-import ServiceTypeSection, { type ServiceType } from "./ServiceTypeSection";
+import ServiceTypeSection from "./ServiceTypeSection";
 import StatusOverview from "./StatusOverview";
 
 interface BaseDashboardProps<T extends ServiceInstance> {

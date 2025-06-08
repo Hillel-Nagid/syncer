@@ -2,13 +2,7 @@ import { createSignal, For } from "solid-js";
 import Button from "../ui/Button";
 import Icon from "../ui/Icon";
 import Modal from "./Modal";
-
-interface ServiceType {
-    id: string;
-    name: string;
-    description: string;
-    icon: "google-calendar-icon" | "outlook-icon";
-}
+import type { ServiceType } from "~/types";
 
 interface CalendarConfigModalProps {
     isOpen: () => boolean;

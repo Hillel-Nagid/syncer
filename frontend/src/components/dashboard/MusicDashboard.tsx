@@ -1,12 +1,11 @@
 import { createSignal } from "solid-js";
-import { BaseDashboard, type ServiceInstance, type ServiceType } from "~/components/dashboard";
+import { BaseDashboard } from "~/components/dashboard";
+import type { ExtendedServiceInstanceSyncSettings, ServiceInstance, ServiceSpecificConfig, ServiceType } from "~/types";
 import {
     CheckboxField,
     ConfigSection,
     SelectField,
     ServiceInstanceConfigModal,
-    type ExtendedServiceInstanceSyncSettings,
-    type ServiceSpecificConfig
 } from ".";
 import MusicConfigModal from "../modals/MusicConfigModal";
 

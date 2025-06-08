@@ -1,14 +1,8 @@
 import { createSignal, For } from "solid-js";
+import type { ServiceType } from "~/types";
 import Button from "../ui/Button";
 import Icon from "../ui/Icon";
 import Modal from "./Modal";
-
-interface ServiceType {
-    id: string;
-    name: string;
-    description: string;
-    icon: "spotify-icon" | "apple-music-icon" | "youtube-icon" | "deezer-icon" | "tidal-icon";
-}
 
 interface MusicConfigModalProps {
     isOpen: () => boolean;
