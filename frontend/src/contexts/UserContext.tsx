@@ -1,41 +1,58 @@
 import { createContext, createSignal, JSX, onMount, useContext } from "solid-js";
-import { User } from "~/types";
+import { apiService } from "~/api";
+import { AuthResponse, User } from "~/types";
 
 interface UserContextType {
     user: () => User | null;
     isLoggedIn: () => boolean;
-    login: (userData: User) => void;
-    logout: () => void;
+    login: (authResponse: AuthResponse) => void;
+    logout: () => Promise<void>;
+    isLoading: () => boolean;
 }
 
 const UserContext = createContext<UserContextType>();
 
 export function UserProvider(props: { children: JSX.Element }) {
     const [user, setUser] = createSignal<User | null>(null);
+    const [isLoading, setIsLoading] = createSignal(true);
 
-    onMount(() => {
-        // Check localStorage for existing user session
-        const savedUser = localStorage.getItem("user");
-        if (savedUser) {
-            try {
-                setUser(JSON.parse(savedUser));
-            } catch (error) {
-                console.error("Failed to parse saved user data:", error);
-                localStorage.removeItem("user");
+    onMount(async () => {
+        try {
+            const profile = await apiService.getProfile();
+            if (profile) {
+                const userFromProfile: User = {
+                    id: profile.user_id,
+                    primary_email: profile.email,
+                    // TODO: Get this from a separate endpoint
+                    full_name: '',
+                    created_at: '',
+                    updated_at: '',
+                };
+                setUser(userFromProfile);
             }
+        } catch (error) {
+            console.warn("No valid session found");
+            // No valid session, user is not logged in
+            setUser(null);
+        } finally {
+            setIsLoading(false);
         }
     });
 
     const isLoggedIn = () => user() !== null;
 
-    const login = (userData: User) => {
-        setUser(userData);
-        localStorage.setItem("user", JSON.stringify(userData));
+    const login = (authResponse: AuthResponse) => {
+        setUser(authResponse.user);
     };
 
-    const logout = () => {
-        setUser(null);
-        localStorage.removeItem("user");
+    const logout = async () => {
+        try {
+            await apiService.logout();
+        } catch (error) {
+            console.warn("Logout API call failed:", error);
+        } finally {
+            setUser(null);
+        }
     };
 
     const value: UserContextType = {
@@ -43,6 +60,7 @@ export function UserProvider(props: { children: JSX.Element }) {
         isLoggedIn,
         login,
         logout,
+        isLoading,
     };
 
     return (

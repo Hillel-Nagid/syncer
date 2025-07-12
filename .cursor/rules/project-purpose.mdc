@@ -1,0 +1,6 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+The app is a syncronization engine between different services such as Calendars and music streaming services

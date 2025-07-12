@@ -1,5 +1,4 @@
 import { A } from "@solidjs/router";
-import { Show } from "solid-js";
 import Button from "~/components/ui/Button";
 import Card from "~/components/ui/Card";
 import Container from "~/components/ui/Container";
@@ -7,7 +6,6 @@ import FeatureCard from "~/components/ui/FeatureCard";
 import Hero from "~/components/ui/Hero";
 import Icon from "~/components/ui/Icon";
 import Page from "~/components/ui/Page";
-import { useUser } from "~/contexts/UserContext";
 import type { IconName } from "~/types";
 
 // Hero Section Component
@@ -133,52 +131,6 @@ function SupportedServicesSection() {
   );
 }
 
-// Demo Authentication Section Component
-function DemoAuthSection() {
-  const { isLoggedIn, login, logout, user } = useUser();
-
-  const handleDemoLogin = () => {
-    login({
-      id: "demo-user",
-      username: "John Doe",
-      email: "john@example.com",
-      profilePicture: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
-    });
-  };
-
-  return (
-    <section class="py-20 px-4 bg-slate-50 dark:bg-slate-800/50">
-      <Container maxWidth="lg">
-        <div class="text-center">
-          <h2 class="text-3xl md:text-4xl font-bold mb-6">
-            Demo Authentication
-          </h2>
-          <p class="text-xl text-slate-600 dark:text-slate-400 mb-8">
-            Test the authentication functionality by logging in and out.
-          </p>
-          <Show
-            when={isLoggedIn()}
-            fallback={
-              <Button variant="primary" size="lg" onClick={handleDemoLogin} class="justify-self-center">
-                Demo Login
-              </Button>
-            }
-          >
-            <div class="flex flex-col items-center space-y-4">
-              <p class="text-lg text-slate-700 dark:text-slate-300">
-                Welcome back, {user()?.username}!
-              </p>
-              <Button variant="secondary" size="lg" onClick={logout} class="justify-self-center">
-                Demo Logout
-              </Button>
-            </div>
-          </Show>
-        </div>
-      </Container>
-    </section>
-  );
-}
-
 // Call to Action Section Component
 function CallToActionSection() {
   return (
@@ -192,7 +144,7 @@ function CallToActionSection() {
             Join thousands of users who have simplified their digital workflow with Syncer.
           </p>
           <A href="/dashboard">
-            <Button variant="primary" size="lg" class="justify-self-center">
+            <Button variant="primary" size="lg" class="mx-auto justify-self-center">
               Start Syncing Now
             </Button>
           </A>
@@ -213,7 +165,6 @@ export default function Home() {
         <FeaturesSection />
         <SupportedServicesSection />
         <CallToActionSection />
-        <DemoAuthSection />
       </main>
     </Page>
   );

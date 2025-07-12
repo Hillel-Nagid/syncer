@@ -7,8 +7,8 @@ export default function UserProfile() {
     const [isDropdownOpen, setIsDropdownOpen] = createSignal(false);
     let dropdownRef: HTMLDivElement | undefined;
 
-    const handleLogout = () => {
-        logout();
+    const handleLogout = async () => {
+        await logout();
         setIsDropdownOpen(false);
     };
 
@@ -39,7 +39,7 @@ export default function UserProfile() {
                 onClick={toggleDropdown}
             >
                 <Show
-                    when={user()?.profilePicture}
+                    when={user()?.avatar_url}
                     fallback={
                         <div class="w-8 h-8 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center">
                             <Icon name="user-icon" class="w-5 h-5 text-emerald-600 dark:text-emerald-400" alt="User Icon" />
@@ -47,19 +47,19 @@ export default function UserProfile() {
                     }
                 >
                     <img
-                        src={user()?.profilePicture}
-                        alt={`${user()?.username}'s profile`}
+                        src={user()?.avatar_url}
+                        alt={`${user()?.full_name}'s profile`}
                         class="w-8 h-8 rounded-full object-cover"
                     />
                 </Show>
-                <span class="text-sm font-medium hidden sm:block">{user()?.username}</span>
+                <span class="text-sm font-medium hidden sm:block">{user()?.full_name}</span>
             </button>
 
             <Show when={isDropdownOpen()}>
                 <div class="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 z-50">
                     <div class="px-4 py-3 border-b border-slate-200 dark:border-slate-700">
-                        <p class="text-sm font-medium text-slate-900 dark:text-slate-100">{user()?.username}</p>
-                        <p class="text-xs text-slate-500 dark:text-slate-400">{user()?.email}</p>
+                        <p class="text-sm font-medium text-slate-900 dark:text-slate-100">{user()?.full_name}</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">{user()?.primary_email}</p>
                     </div>
                     <div class="py-1">
                         <button

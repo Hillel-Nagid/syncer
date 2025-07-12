@@ -1,11 +1,13 @@
-import { A } from "@solidjs/router";
-import { createSignal } from "solid-js";
+import { A, useNavigate } from "@solidjs/router";
+import { createSignal, Show } from "solid-js";
+import { apiService, ApiServiceError } from "~/api";
 import AuthLayout from "~/components/auth/AuthLayout";
-import Button from "~/components/ui/Button";
 import FormError from "~/components/forms/FormError";
 import FormInput from "~/components/forms/FormInput";
+import Button from "~/components/ui/Button";
 import Icon from "~/components/ui/Icon";
 import LoadingSpinner from "~/components/ui/LoadingSpinner";
+import { useUser } from "~/contexts/UserContext";
 
 export default function Login() {
     const [formData, setFormData] = createSignal({
@@ -15,6 +17,9 @@ export default function Login() {
     const [errors, setErrors] = createSignal<Record<string, string>>({});
     const [isLoading, setIsLoading] = createSignal(false);
     const [rememberMe, setRememberMe] = createSignal(false);
+
+    const { login } = useUser();
+    const navigate = useNavigate();
 
     const handleInputChange = (field: string, value: string) => {
         setFormData(prev => ({ ...prev, [field]: value }));
@@ -50,24 +55,48 @@ export default function Login() {
         }
 
         setIsLoading(true);
+        setErrors({});
 
         try {
-            // TODO: Implement actual login API call
-            await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
-            console.log("Login data:", { ...formData(), rememberMe: rememberMe() });
-            // Redirect to dashboard on success
+            const response = await apiService.login({
+                email: formData().email,
+                password: formData().password,
+            });
+
+            login(response);
+            navigate("/dashboard");
         } catch (error) {
             console.error("Login error:", error);
-            setErrors({ general: "Invalid email or password. Please try again." });
+            if (error instanceof ApiServiceError) {
+                if (error.status === 401) {
+                    setErrors({ general: "Invalid email or password. Please try again." });
+                } else {
+                    setErrors({ general: error.message });
+                }
+            } else {
+                setErrors({ general: "Something went wrong. Please try again." });
+            }
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const handleGoogleLogin = async () => {
+        try {
+            const response = await apiService.getGoogleAuthUrl();
+            window.location.href = response.auth_url;
+        } catch (error) {
+            console.error("Google login error:", error);
+            setErrors({ general: "Failed to initialize Google login. Please try again." });
         }
     };
 
     const formContent = (
         <form class="space-y-6" onSubmit={handleSubmit}>
             {/* General Error */}
-            {errors().general && <FormError message={errors().general} />}
+            <Show when={errors().general}>
+                <FormError message={errors().general} />
+            </Show>
 
             {/* Email Field */}
             <FormInput
@@ -109,12 +138,12 @@ export default function Login() {
                 </div>
 
                 <div class="text-sm">
-                    <a
+                    <A
                         href="/auth/forgot-password"
                         class="text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 font-medium"
                     >
                         Forgot your password?
-                    </a>
+                    </A>
                 </div>
             </div>
 
@@ -125,7 +154,12 @@ export default function Login() {
                 size="lg"
                 class="w-full justify-center"
             >
-                {isLoading() ? <LoadingSpinner text="Signing in..." /> : "Sign In"}
+                <Show when={isLoading()}>
+                    <LoadingSpinner text="Signing in..." />
+                </Show>
+                <Show when={!isLoading()}>
+                    Sign In
+                </Show>
             </Button>
 
             {/* Divider */}
@@ -140,14 +174,14 @@ export default function Login() {
                 </div>
             </div>
 
-            {/* Social Login Button */}
+            {/* Google Login Button */}
             <div class="flex justify-center">
                 <Button
                     variant="secondary"
                     size="md"
                     class="w-full max-w-sm justify-center"
                     icon="google-icon"
-                    onClick={() => console.log("Google login")}
+                    onClick={handleGoogleLogin}
                 >
                     Continue with Google
                 </Button>

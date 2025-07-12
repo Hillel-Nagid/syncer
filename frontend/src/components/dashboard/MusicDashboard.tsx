@@ -81,7 +81,6 @@ export default function MusicDashboard(props: MusicDashboardProps) {
     const [isConfigModalOpen, setIsConfigModalOpen] = createSignal(false);
     const [selectedServiceForConfig, setSelectedServiceForConfig] = createSignal<MusicService | null>(null);
 
-    // Music-specific configuration signals
     const [syncPlaylists, setSyncPlaylists] = createSignal<boolean>(true);
     const [syncLikedSongs, setSyncLikedSongs] = createSignal<boolean>(true);
     const [syncLibrary, setSyncLibrary] = createSignal<boolean>(true);
@@ -181,7 +180,6 @@ export default function MusicDashboard(props: MusicDashboardProps) {
 
     const connectedCount = () => services().filter(s => s.connected).length;
 
-    // Music-specific configuration handlers
     const getServiceSpecificConfig = (): ServiceSpecificConfig => {
         return {
             syncPlaylists: syncPlaylists(),
@@ -214,7 +212,6 @@ export default function MusicDashboard(props: MusicDashboardProps) {
         setPrivateMode(false);
     };
 
-    // Music-specific configuration section
     const musicConfigSection = (
         <>
             <ConfigSection title="Music Sync Options">

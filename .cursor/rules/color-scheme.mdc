@@ -1,0 +1,6 @@
+---
+description: styling
+globs: 
+alwaysApply: false
+---
+The color theme of the app follows the Emerald color of Tailwind

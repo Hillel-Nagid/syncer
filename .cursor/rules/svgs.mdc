@@ -1,0 +1,6 @@
+---
+description: icons or svgs
+globs: 
+alwaysApply: false
+---
+Icons and SVG elements must be imported and stored at the components' icons directory
