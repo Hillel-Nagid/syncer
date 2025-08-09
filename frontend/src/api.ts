@@ -6,6 +6,7 @@ import type {
     RegisterRequest,
     ResendVerificationRequest,
     ResetPasswordRequest,
+    User,
     VerifyEmailRequest,
 } from '~/types';
 
@@ -246,8 +247,8 @@ class ApiService {
         return this.request<{ auth_url: string }>('/auth/google');
     }
 
-    async getProfile(): Promise<{ user_id: string; email: string }> {
-        return this.request<{ user_id: string; email: string }>('/api/profile');
+    async getProfile(): Promise<User> {
+        return this.request<User>('/auth/profile');
     }
 
     async getServices(): Promise<any> {

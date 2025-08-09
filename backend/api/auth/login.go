@@ -3,7 +3,9 @@ package auth
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"syncer.net/core/users"
@@ -51,6 +53,10 @@ func (s *AuthService) LoginWithGoogle(c *gin.Context) {
 func (s *AuthService) GoogleCallback(c *gin.Context) {
 	state := c.Query("state")
 	storedState, _ := c.Cookie("oauth_state")
+
+	// Log state validation for debugging
+	log.Printf("OAuth state validation: received=%s, stored=%s", state, storedState)
+
 	if state != storedState {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid state parameter"})
 		return
@@ -77,9 +83,15 @@ func (s *AuthService) GoogleCallback(c *gin.Context) {
 		return
 	}
 
+	// Log the Google user info for debugging
+	log.Printf("Google user info: ID=%s, Email=%s, Name=%s, VerifiedEmail=%t",
+		googleUser.ID, googleUser.Email, googleUser.Name, googleUser.VerifiedEmail)
+
 	user, err := users.CreateUserWithGoogle(s.db, &googleUser)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
+		// Log the actual error for debugging
+		log.Printf("Failed to create user with Google: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user", "details": err.Error()})
 		return
 	}
 
@@ -93,9 +105,12 @@ func (s *AuthService) GoogleCallback(c *gin.Context) {
 
 	s.setSecureCookies(c, tokens.AccessToken, tokens.RefreshToken)
 
-	c.JSON(http.StatusOK, AuthResponse{
-		User: user,
-	})
+	frontendURL := os.Getenv("FRONTEND_URL")
+	if frontendURL == "" {
+		frontendURL = "http://localhost:3000"
+	}
+
+	c.Redirect(http.StatusFound, frontendURL)
 }
 
 func (s *AuthService) LoginWithEmail(c *gin.Context) {

@@ -20,15 +20,7 @@ export function UserProvider(props: { children: JSX.Element }) {
         try {
             const profile = await apiService.getProfile();
             if (profile) {
-                const userFromProfile: User = {
-                    id: profile.user_id,
-                    primary_email: profile.email,
-                    // TODO: Get this from a separate endpoint
-                    full_name: '',
-                    created_at: '',
-                    updated_at: '',
-                };
-                setUser(userFromProfile);
+                setUser(profile);
             }
         } catch (error) {
             console.warn("No valid session found");

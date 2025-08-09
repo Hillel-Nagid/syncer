@@ -71,12 +71,12 @@ func CreateUserWithEmail(db *sqlx.DB, email, password, fullName string) (*User, 
 		ID:                  uuid.New().String(),
 		UserID:              user.ID,
 		Provider:            EmailProvider,
-		ProviderEmail:       email,
-		PasswordHash:        string(hashedPassword),
+		ProviderEmail:       sql.NullString{String: email, Valid: true},
+		PasswordHash:        sql.NullString{String: string(hashedPassword), Valid: true},
 		EmailVerified:       false,
 		IsPrimary:           true,
-		VerificationToken:   verificationToken,
-		VerificationExpires: time.Now().Add(24 * time.Hour),
+		VerificationToken:   sql.NullString{String: verificationToken, Valid: true},
+		VerificationExpires: sql.NullTime{Time: time.Now().Add(24 * time.Hour), Valid: true},
 		CreatedAt:           time.Now(),
 		UpdatedAt:           time.Now(),
 	}
@@ -134,8 +134,8 @@ func CreateUserWithGoogle(db *sqlx.DB, googleInfo *GoogleUserInfo) (*User, error
 			ID:            uuid.New().String(),
 			UserID:        existingUser.ID,
 			Provider:      GoogleProvider,
-			ProviderID:    googleInfo.ID,
-			ProviderEmail: googleInfo.Email,
+			ProviderID:    sql.NullString{String: googleInfo.ID, Valid: true},
+			ProviderEmail: sql.NullString{String: googleInfo.Email, Valid: true},
 			EmailVerified: googleInfo.VerifiedEmail,
 			IsPrimary:     false,
 			Metadata:      metadata,
@@ -166,7 +166,7 @@ func CreateUserWithGoogle(db *sqlx.DB, googleInfo *GoogleUserInfo) (*User, error
 		ID:           uuid.New().String(),
 		PrimaryEmail: googleInfo.Email,
 		FullName:     googleInfo.Name,
-		AvatarURL:    googleInfo.Picture,
+		AvatarURL:    sql.NullString{String: googleInfo.Picture, Valid: true},
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),
 	}
@@ -184,8 +184,8 @@ func CreateUserWithGoogle(db *sqlx.DB, googleInfo *GoogleUserInfo) (*User, error
 		ID:            uuid.New().String(),
 		UserID:        user.ID,
 		Provider:      GoogleProvider,
-		ProviderID:    googleInfo.ID,
-		ProviderEmail: googleInfo.Email,
+		ProviderID:    sql.NullString{String: googleInfo.ID, Valid: true},
+		ProviderEmail: sql.NullString{String: googleInfo.Email, Valid: true},
 		EmailVerified: googleInfo.VerifiedEmail,
 		IsPrimary:     true,
 		Metadata:      metadata,
@@ -224,7 +224,10 @@ func VerifyEmailPassword(db *sqlx.DB, email, password string) (*User, error) {
 		return nil, ErrInvalidCredentials
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(authMethod.PasswordHash), []byte(password))
+	if !authMethod.PasswordHash.Valid {
+		return nil, ErrInvalidCredentials
+	}
+	err = bcrypt.CompareHashAndPassword([]byte(authMethod.PasswordHash.String), []byte(password))
 	if err != nil {
 		return nil, ErrInvalidCredentials
 	}
@@ -259,7 +262,7 @@ func VerifyEmail(db *sqlx.DB, token string) error {
 	}
 
 	// Check if token has expired
-	if time.Now().After(authMethod.VerificationExpires) {
+	if !authMethod.VerificationExpires.Valid || time.Now().After(authMethod.VerificationExpires.Time) {
 		return errors.New("verification token has expired")
 	}
 
@@ -394,7 +397,7 @@ func ResetPassword(db *sqlx.DB, token, newPassword string) error {
 		return err
 	}
 
-	if time.Now().After(authMethod.ResetExpires) {
+	if !authMethod.ResetExpires.Valid || time.Now().After(authMethod.ResetExpires.Time) {
 		return errors.New("reset token has expired")
 	}
 

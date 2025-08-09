@@ -1,38 +1,39 @@
 package users
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/jmoiron/sqlx"
 )
 
 type User struct {
-	ID           string    `json:"id" db:"id"`
-	PrimaryEmail string    `json:"primary_email" db:"primary_email"`
-	FullName     string    `json:"full_name" db:"full_name"`
-	AvatarURL    string    `json:"avatar_url" db:"avatar_url"`
-	LastLogin    time.Time `json:"last_login" db:"last_login"`
-	Online       bool      `json:"online" db:"online"`
-	CreatedAt    time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at" db:"updated_at"`
+	ID           string         `json:"id" db:"id"`
+	PrimaryEmail string         `json:"primary_email" db:"primary_email"`
+	FullName     string         `json:"full_name" db:"full_name"`
+	AvatarURL    sql.NullString `json:"avatar_url,omitempty" db:"avatar_url"`
+	LastLogin    sql.NullTime   `json:"last_login,omitempty" db:"last_login"`
+	Online       bool           `json:"online" db:"online"`
+	CreatedAt    time.Time      `json:"created_at" db:"created_at"`
+	UpdatedAt    time.Time      `json:"updated_at" db:"updated_at"`
 }
 
 type UserAuthMethod struct {
-	ID                  string    `json:"id" db:"id"`
-	UserID              string    `json:"user_id" db:"user_id"`
-	Provider            Provider  `json:"provider" db:"provider"`
-	ProviderID          string    `json:"provider_id" db:"provider_id"`
-	ProviderEmail       string    `json:"provider_email" db:"provider_email"`
-	PasswordHash        string    `json:"password_hash,omitempty" db:"password_hash"`
-	EmailVerified       bool      `json:"email_verified" db:"email_verified"`
-	IsPrimary           bool      `json:"is_primary" db:"is_primary"`
-	VerificationToken   string    `json:"verification_token,omitempty" db:"verification_token"`
-	VerificationExpires time.Time `json:"verification_expires,omitempty" db:"verification_expires"`
-	ResetToken          string    `json:"reset_token,omitempty" db:"reset_token"`
-	ResetExpires        time.Time `json:"reset_expires,omitempty" db:"reset_expires"`
-	Metadata            []byte    `json:"metadata,omitempty" db:"metadata"`
-	CreatedAt           time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt           time.Time `json:"updated_at" db:"updated_at"`
+	ID                  string         `json:"id" db:"id"`
+	UserID              string         `json:"user_id" db:"user_id"`
+	Provider            Provider       `json:"provider" db:"provider"`
+	ProviderID          sql.NullString `json:"provider_id" db:"provider_id"`
+	ProviderEmail       sql.NullString `json:"provider_email" db:"provider_email"`
+	PasswordHash        sql.NullString `json:"password_hash,omitempty" db:"password_hash"`
+	EmailVerified       bool           `json:"email_verified" db:"email_verified"`
+	IsPrimary           bool           `json:"is_primary" db:"is_primary"`
+	VerificationToken   sql.NullString `json:"verification_token,omitempty" db:"verification_token"`
+	VerificationExpires sql.NullTime   `json:"verification_expires,omitempty" db:"verification_expires"`
+	ResetToken          sql.NullString `json:"reset_token,omitempty" db:"reset_token"`
+	ResetExpires        sql.NullTime   `json:"reset_expires,omitempty" db:"reset_expires"`
+	Metadata            []byte         `json:"metadata,omitempty" db:"metadata"`
+	CreatedAt           time.Time      `json:"created_at" db:"created_at"`
+	UpdatedAt           time.Time      `json:"updated_at" db:"updated_at"`
 }
 
 // GoogleUserInfo represents the user info from Google OAuth
@@ -44,10 +45,36 @@ type GoogleUserInfo struct {
 	VerifiedEmail bool   `json:"verified_email"`
 }
 
+// UserProfile represents comprehensive user profile information
+type UserProfile struct {
+	User *User `json:"user"`
+}
+
+// UserStats represents user statistics
+type UserStats struct {
+	TotalSessions     int    `json:"total_sessions"`
+	ActiveSessions    int    `json:"active_sessions"`
+	LastSessionIP     string `json:"last_session_ip,omitempty"`
+	LastSessionAgent  string `json:"last_session_agent,omitempty"`
+	ConnectedServices int    `json:"connected_services"`
+}
+
 func (u *User) UpdateLastLogin(db *sqlx.DB) error {
-	u.LastLogin = time.Now()
-	_, err := db.Exec("UPDATE users SET last_login = $1 WHERE id = $2", u.LastLogin, u.ID)
+	now := time.Now()
+	u.LastLogin = sql.NullTime{Time: now, Valid: true}
+	_, err := db.Exec("UPDATE users SET last_login = $1 WHERE id = $2", now, u.ID)
 	return err
+}
+
+// GetUserByID retrieves a user by their ID
+func GetUserByID(db *sqlx.DB, userID string) (*User, error) {
+	var user User
+	err := db.Get(&user, "SELECT * FROM users WHERE id = $1", userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
 }
 
 // GetUserByEmail retrieves a user by their primary email
@@ -129,4 +156,50 @@ func GetPrimaryAuthMethod(db *sqlx.DB, userID string) (*UserAuthMethod, error) {
 		return nil, err
 	}
 	return &method, nil
+}
+
+// GetUserStats retrieves user statistics
+func GetUserStats(db *sqlx.DB, userID string) (*UserStats, error) {
+	stats := &UserStats{}
+
+	// Get session statistics
+	err := db.Get(&stats.TotalSessions, "SELECT COUNT(*) FROM user_sessions WHERE user_id = $1", userID)
+	if err != nil {
+		return nil, err
+	}
+
+	err = db.Get(&stats.ActiveSessions, "SELECT COUNT(*) FROM user_sessions WHERE user_id = $1 AND is_active = true AND expires_at > NOW()", userID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Get last session info
+	var lastSession struct {
+		IPAddress sql.NullString `db:"ip_address"`
+		UserAgent sql.NullString `db:"user_agent"`
+	}
+	err = db.Get(&lastSession, `
+		SELECT ip_address, user_agent 
+		FROM user_sessions 
+		WHERE user_id = $1 
+		ORDER BY last_used_at DESC 
+		LIMIT 1
+	`, userID)
+	if err != nil && err != sql.ErrNoRows {
+		return nil, err
+	}
+	if lastSession.IPAddress.Valid {
+		stats.LastSessionIP = lastSession.IPAddress.String
+	}
+	if lastSession.UserAgent.Valid {
+		stats.LastSessionAgent = lastSession.UserAgent.String
+	}
+
+	// Get connected services count
+	err = db.Get(&stats.ConnectedServices, "SELECT COUNT(*) FROM user_services WHERE user_id = $1", userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return stats, nil
 }

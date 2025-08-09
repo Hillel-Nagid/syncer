@@ -108,7 +108,7 @@ func SecurityHeadersMiddleware() gin.HandlerFunc {
 
 		c.Writer.Header().Set("Referrer-Policy", "no-referrer")
 
-		if c.Request.URL.Path == "/api/profile" || c.Request.URL.Path == "/auth/login" {
+		if c.Request.URL.Path == "/auth/profile" || c.Request.URL.Path == "/auth/login" {
 			c.Writer.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 			c.Writer.Header().Set("Pragma", "no-cache")
 			c.Writer.Header().Set("Expires", "0")

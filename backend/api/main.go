@@ -13,6 +13,7 @@ import (
 	"syncer.net/api/middlewares"
 	coreAuth "syncer.net/core/auth"
 	"syncer.net/core/email"
+	"syncer.net/utils"
 )
 
 func main() {
@@ -24,6 +25,11 @@ func main() {
 
 	if err := db.Ping(); err != nil {
 		log.Fatalf("Failed to ping database: %v", err)
+	}
+
+	// Run database migrations
+	if err := utils.RunMigrations(db.DB, "db/migrations"); err != nil {
+		log.Fatalf("Failed to run migrations: %v", err)
 	}
 
 	jwtSecret := os.Getenv("JWT_SECRET")
@@ -78,21 +84,12 @@ func main() {
 			protectedAuthRoutes.POST("/logout", authService.Logout)
 			protectedAuthRoutes.POST("/logout-all", authService.LogoutAll)
 		}
+		protectedAuthRoutes.GET("/profile", authService.GetProfileBasicInfo)
 	}
 
 	protectedRoutes := router.Group("/api")
 	protectedRoutes.Use(middlewares.AuthMiddleware(jwtService, sessionService))
 	protectedRoutes.Use(middlewares.CSRFMiddleware())
-	{
-		protectedRoutes.GET("/profile", func(c *gin.Context) {
-			userID := c.GetString("user_id")
-			userEmail := c.GetString("user_email")
-			c.JSON(200, gin.H{
-				"user_id": userID,
-				"email":   userEmail,
-			})
-		})
-	}
 
 	serviceRoutes := protectedRoutes.Group("/services")
 	{
