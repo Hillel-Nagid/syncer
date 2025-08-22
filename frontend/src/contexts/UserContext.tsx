@@ -1,4 +1,4 @@
-import { createContext, createSignal, JSX, onMount, useContext } from "solid-js";
+import { createContext, createEffect, createSignal, JSX, onMount, useContext } from "solid-js";
 import { apiService } from "~/api";
 import { AuthResponse, User } from "~/types";
 
@@ -21,15 +21,17 @@ export function UserProvider(props: { children: JSX.Element }) {
             const profile = await apiService.getProfile();
             if (profile) {
                 setUser(profile);
+            } else {
+                setUser(null);
             }
         } catch (error) {
-            console.warn("No valid session found");
-            // No valid session, user is not logged in
+            console.error("Error fetching profile:", error);
             setUser(null);
         } finally {
             setIsLoading(false);
         }
     });
+
 
     const isLoggedIn = () => user() !== null;
 

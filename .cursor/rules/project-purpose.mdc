@@ -1,6 +1,9 @@
 ---
-description: 
-globs: 
+description:
+globs:
 alwaysApply: true
 ---
-The app is a syncronization engine between different services such as Calendars and music streaming services
+
+The app is a syncronization engine between different services such as Calendars and music streaming services.
+The app preserves the users' provacy, and doesn't store their syncronized datq persistently.
+The app should sync the users' data between different comparable services.
