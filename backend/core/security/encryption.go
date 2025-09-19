@@ -10,16 +10,11 @@ import (
 
 // TokenEncryption provides AES-256 encryption for sensitive tokens
 type TokenEncryption struct {
-	key []byte
+	key [32]byte
 }
 
 // NewTokenEncryption creates a new token encryption instance
-// The key must be 32 bytes for AES-256
-func NewTokenEncryption(key []byte) (*TokenEncryption, error) {
-	if len(key) != 32 {
-		return nil, fmt.Errorf("encryption key must be exactly 32 bytes, got %d", len(key))
-	}
-
+func NewTokenEncryption(key [32]byte) (*TokenEncryption, error) {
 	return &TokenEncryption{key: key}, nil
 }
 
@@ -29,7 +24,7 @@ func (e *TokenEncryption) Encrypt(plaintext string) ([]byte, error) {
 		return nil, fmt.Errorf("plaintext cannot be empty")
 	}
 
-	block, err := aes.NewCipher(e.key)
+	block, err := aes.NewCipher(e.key[:])
 	if err != nil {
 		return nil, fmt.Errorf("failed to create cipher: %w", err)
 	}
@@ -54,7 +49,7 @@ func (e *TokenEncryption) Decrypt(ciphertext []byte) (string, error) {
 		return "", fmt.Errorf("ciphertext cannot be empty")
 	}
 
-	block, err := aes.NewCipher(e.key)
+	block, err := aes.NewCipher(e.key[:])
 	if err != nil {
 		return "", fmt.Errorf("failed to create cipher: %w", err)
 	}

@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"database/sql"
 	"errors"
 	"time"
 
@@ -16,18 +17,18 @@ type SessionService struct {
 }
 
 type UserSession struct {
-	ID               string    `json:"id" db:"id"`
-	UserID           string    `json:"user_id" db:"user_id"`
-	SessionToken     string    `json:"session_token" db:"session_token"`
-	RefreshToken     string    `json:"refresh_token" db:"refresh_token"`
-	ExpiresAt        time.Time `json:"expires_at" db:"expires_at"`
-	RefreshExpiresAt time.Time `json:"refresh_expires_at" db:"refresh_expires_at"`
-	IPAddress        string    `json:"ip_address" db:"ip_address"`
-	UserAgent        string    `json:"user_agent" db:"user_agent"`
-	IsActive         bool      `json:"is_active" db:"is_active"`
-	LastUsedAt       time.Time `json:"last_used_at" db:"last_used_at"`
-	CreatedAt        time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt        time.Time `json:"updated_at" db:"updated_at"`
+	ID               string         `json:"id" db:"id"`
+	UserID           string         `json:"user_id" db:"user_id"`
+	SessionToken     string         `json:"session_token" db:"session_token"`
+	RefreshToken     string         `json:"refresh_token" db:"refresh_token"`
+	ExpiresAt        time.Time      `json:"expires_at" db:"expires_at"`
+	RefreshExpiresAt time.Time      `json:"refresh_expires_at" db:"refresh_expires_at"`
+	IPAddress        sql.NullString `json:"ip_address" db:"ip_address"`
+	UserAgent        sql.NullString `json:"user_agent" db:"user_agent"`
+	IsActive         bool           `json:"is_active" db:"is_active"`
+	LastUsedAt       sql.NullTime   `json:"last_used_at" db:"last_used_at"`
+	CreatedAt        time.Time      `json:"created_at" db:"created_at"`
+	UpdatedAt        time.Time      `json:"updated_at" db:"updated_at"`
 }
 
 type AuthTokens struct {
@@ -64,12 +65,12 @@ func (s *SessionService) CreateSession(user *users.User, ipAddress, userAgent st
 		UserID:           user.ID,
 		SessionToken:     sessionToken,
 		RefreshToken:     refreshToken,
-		ExpiresAt:        time.Now().Add(15 * time.Minute),   // Short-lived access tokens
-		RefreshExpiresAt: time.Now().Add(7 * 24 * time.Hour), // 7 days
-		IPAddress:        ipAddress,
-		UserAgent:        userAgent,
+		ExpiresAt:        time.Now().Add(15 * time.Minute),
+		RefreshExpiresAt: time.Now().Add(7 * 24 * time.Hour),
+		IPAddress:        sql.NullString{String: ipAddress, Valid: ipAddress != ""},
+		UserAgent:        sql.NullString{String: userAgent, Valid: userAgent != ""},
 		IsActive:         true,
-		LastUsedAt:       time.Now(),
+		LastUsedAt:       sql.NullTime{Time: time.Now(), Valid: true},
 		CreatedAt:        time.Now(),
 		UpdatedAt:        time.Now(),
 	}
@@ -94,7 +95,7 @@ func (s *SessionService) CreateSession(user *users.User, ipAddress, userAgent st
 	return &AuthTokens{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
-		ExpiresIn:    15 * 60, // 15 minutes in seconds
+		ExpiresIn:    15 * 60,
 	}, nil
 }
 

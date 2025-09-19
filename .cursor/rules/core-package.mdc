@@ -1,0 +1,7 @@
+---
+description:
+globs: core/*
+alwaysApply: false
+---
+
+The backend's core package role is to provide generics and be a library, that is agnostic to specific uses of it

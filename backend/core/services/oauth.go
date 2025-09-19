@@ -2,9 +2,7 @@ package services
 
 import (
 	"context"
-	"crypto/rand"
 	"database/sql"
-	"encoding/base64"
 	"fmt"
 	"log"
 	"time"
@@ -12,18 +10,19 @@ import (
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"syncer.net/core/security"
+	"syncer.net/utils"
 )
 
 // OAuthManager handles OAuth flows and token management
 type OAuthManager struct {
-	registry   *ServiceRegistry
+	Registry   *ServiceRegistry
 	db         *sqlx.DB
 	encryption *security.TokenEncryption
 	logger     *log.Logger
 }
 
 // NewOAuthManager creates a new OAuth manager
-func NewOAuthManager(registry *ServiceRegistry, db *sqlx.DB, encryptionKey []byte, logger *log.Logger) (*OAuthManager, error) {
+func NewOAuthManager(registry *ServiceRegistry, db *sqlx.DB, encryptionKey [32]byte, logger *log.Logger) (*OAuthManager, error) {
 	if logger == nil {
 		logger = log.New(log.Writer(), "[OAuthManager] ", log.LstdFlags)
 	}
@@ -34,7 +33,7 @@ func NewOAuthManager(registry *ServiceRegistry, db *sqlx.DB, encryptionKey []byt
 	}
 
 	return &OAuthManager{
-		registry:   registry,
+		Registry:   registry,
 		db:         db,
 		encryption: encryption,
 		logger:     logger,
@@ -53,24 +52,24 @@ type PendingAuth struct {
 
 // InitiateAuth starts the OAuth flow for a service
 func (o *OAuthManager) InitiateAuth(serviceName, userID, redirectURL string) (*AuthInitiation, error) {
-	service, err := o.registry.GetService(serviceName)
+	service, err := o.Registry.GetService(serviceName)
 	if err != nil {
 		return nil, fmt.Errorf("service not found: %w", err)
 	}
+	if err := service.HealthCheck(); err != nil {
+		return nil, fmt.Errorf("service is not healthy: %w", err)
+	}
 
-	// Generate secure state token
-	state, err := o.generateStateToken()
+	state, err := utils.GenerateToken()
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate state token: %w", err)
 	}
 
-	// Get authorization URL
 	authURL, err := service.GetAuthURL(state, redirectURL)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get auth URL: %w", err)
 	}
 
-	// Store pending authorization
 	err = o.storePendingAuth(userID, serviceName, state, time.Now().Add(10*time.Minute))
 	if err != nil {
 		return nil, fmt.Errorf("failed to store pending auth: %w", err)
@@ -86,36 +85,35 @@ func (o *OAuthManager) InitiateAuth(serviceName, userID, redirectURL string) (*A
 
 // HandleCallback processes the OAuth callback
 func (o *OAuthManager) HandleCallback(serviceName, code, state string) (*CallbackResult, error) {
-	// Validate state token
 	userID, err := o.validateStateToken(serviceName, state)
 	if err != nil {
 		return nil, fmt.Errorf("invalid state token: %w", err)
 	}
 
-	service, err := o.registry.GetService(serviceName)
+	service, err := o.Registry.GetService(serviceName)
 	if err != nil {
 		return nil, fmt.Errorf("service not found: %w", err)
 	}
 
-	// Exchange code for tokens
+	if err := service.HealthCheck(); err != nil {
+		return nil, fmt.Errorf("service is not healthy: %w", err)
+	}
+
 	tokens, err := service.ExchangeCode(code, "")
 	if err != nil {
 		return nil, fmt.Errorf("failed to exchange code: %w", err)
 	}
 
-	// Get user profile from service
 	profile, err := service.GetUserProfile(context.Background(), tokens)
 	if err != nil {
 		o.logger.Printf("Warning: Failed to get user profile for %s: %v", serviceName, err)
 	}
 
-	// Store user tokens
 	err = o.storeUserTokens(userID, serviceName, tokens, profile)
 	if err != nil {
 		return nil, fmt.Errorf("failed to store tokens: %w", err)
 	}
 
-	// Clean up pending auth
 	o.cleanupPendingAuth(state)
 
 	o.logger.Printf("Successfully completed OAuth flow for user %s, service %s", userID, serviceName)
@@ -129,20 +127,21 @@ func (o *OAuthManager) HandleCallback(serviceName, code, state string) (*Callbac
 
 // RefreshUserTokens refreshes expired tokens for a user service
 func (o *OAuthManager) RefreshUserTokens(userServiceID string) error {
-	// Get current tokens
 	userService, err := o.getUserService(userServiceID)
 	if err != nil {
 		return fmt.Errorf("failed to get user service: %w", err)
 	}
 
-	// Get service provider
-	service, err := o.registry.GetService(userService.ServiceName)
+	service, err := o.Registry.GetService(userService.ServiceName)
 	if err != nil {
 		return fmt.Errorf("service not found: %w", err)
 	}
 
-	// Decrypt refresh token
-	_, refreshToken, err := o.encryption.DecryptTokens(nil, userService.EncryptedRefreshToken)
+	if err := service.HealthCheck(); err != nil {
+		return fmt.Errorf("service is not healthy: %w", err)
+	}
+
+	_, refreshToken, err := o.encryption.DecryptTokens(nil, userService.RefreshToken)
 	if err != nil {
 		return fmt.Errorf("failed to decrypt refresh token: %w", err)
 	}
@@ -151,13 +150,11 @@ func (o *OAuthManager) RefreshUserTokens(userServiceID string) error {
 		return fmt.Errorf("no refresh token available")
 	}
 
-	// Refresh tokens
 	newTokens, err := service.RefreshTokens(refreshToken)
 	if err != nil {
 		return fmt.Errorf("failed to refresh tokens: %w", err)
 	}
 
-	// Update stored tokens
 	err = o.updateUserTokens(userServiceID, newTokens)
 	if err != nil {
 		return fmt.Errorf("failed to update tokens: %w", err)
@@ -174,10 +171,9 @@ func (o *OAuthManager) GetUserTokens(userServiceID string) (*OAuthTokens, error)
 		return nil, fmt.Errorf("failed to get user service: %w", err)
 	}
 
-	// Decrypt tokens
 	accessToken, refreshToken, err := o.encryption.DecryptTokens(
-		userService.EncryptedAccessToken,
-		userService.EncryptedRefreshToken,
+		userService.AccessToken,
+		userService.RefreshToken,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to decrypt tokens: %w", err)
@@ -190,15 +186,6 @@ func (o *OAuthManager) GetUserTokens(userServiceID string) (*OAuthTokens, error)
 		ExpiresAt:    userService.TokenExpiresAt,
 		Scope:        userService.Scopes,
 	}, nil
-}
-
-// generateStateToken creates a cryptographically secure state token
-func (o *OAuthManager) generateStateToken() (string, error) {
-	bytes := make([]byte, 32)
-	if _, err := rand.Read(bytes); err != nil {
-		return "", err
-	}
-	return base64.URLEncoding.EncodeToString(bytes), nil
 }
 
 // storePendingAuth stores a pending OAuth authorization
@@ -242,40 +229,38 @@ func (o *OAuthManager) cleanupPendingAuth(state string) {
 
 // UserServiceRecord represents the enhanced user service record
 type UserServiceRecord struct {
-	ID                    string     `db:"id"`
-	UserID                string     `db:"user_id"`
-	ServiceID             string     `db:"service_id"`
-	ServiceName           string     `db:"service_name"`
-	EncryptedAccessToken  []byte     `db:"encrypted_access_token"`
-	EncryptedRefreshToken []byte     `db:"encrypted_refresh_token"`
-	TokenType             string     `db:"token_type"`
-	TokenExpiresAt        time.Time  `db:"token_expires_at"`
-	LastSyncAt            *time.Time `db:"last_sync_at"`
-	SyncFrequency         string     `db:"sync_frequency"`
-	SyncEnabled           bool       `db:"sync_enabled"`
-	ServiceUserID         string     `db:"service_user_id"`
-	ServiceUsername       string     `db:"service_username"`
-	Scopes                string     `db:"scopes"`
-	CreatedAt             time.Time  `db:"created_at"`
-	UpdatedAt             time.Time  `db:"updated_at"`
+	ID              string         `db:"id"`
+	UserID          string         `db:"user_id"`
+	ServiceID       string         `db:"service_id"`
+	ServiceName     string         `db:"service_name"`
+	AccessToken     []byte         `db:"access_token"`
+	RefreshToken    []byte         `db:"refresh_token"`
+	Metadata        map[string]any `db:"metadata"`
+	TokenType       string         `db:"token_type"`
+	TokenExpiresAt  time.Time      `db:"token_expires_at"`
+	LastSyncAt      *time.Time     `db:"last_sync_at"`
+	SyncFrequency   string         `db:"sync_frequency"`
+	SyncEnabled     bool           `db:"sync_enabled"`
+	ServiceUserID   string         `db:"service_user_id"`
+	ServiceUsername string         `db:"service_username"`
+	Scopes          string         `db:"scopes"`
+	CreatedAt       time.Time      `db:"created_at"`
+	UpdatedAt       time.Time      `db:"updated_at"`
 }
 
 // storeUserTokens encrypts and stores OAuth tokens
 func (o *OAuthManager) storeUserTokens(userID, serviceName string, tokens *OAuthTokens, profile *UserProfile) error {
-	// Get service ID
 	var serviceID string
 	err := o.db.Get(&serviceID, "SELECT id FROM services WHERE name = $1", serviceName)
 	if err != nil {
 		return fmt.Errorf("service not found: %w", err)
 	}
 
-	// Encrypt tokens
 	encryptedAccess, encryptedRefresh, err := o.encryption.EncryptTokens(tokens.AccessToken, tokens.RefreshToken)
 	if err != nil {
 		return fmt.Errorf("failed to encrypt tokens: %w", err)
 	}
 
-	// Prepare profile data
 	serviceUserID := ""
 	serviceUsername := ""
 	if profile != nil {
@@ -283,24 +268,24 @@ func (o *OAuthManager) storeUserTokens(userID, serviceName string, tokens *OAuth
 		serviceUsername = profile.Username
 	}
 
-	// Store or update user service
 	_, err = o.db.Exec(`
 		INSERT INTO user_services (
-			id, user_id, service_id, encrypted_access_token, encrypted_refresh_token,
-			token_type, token_expires_at, service_user_id, service_username, scopes
-		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+			id, user_id, service_id, access_token, refresh_token,
+			token_type, token_expires_at, service_user_id, service_username, scopes, metadata
+		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
 		ON CONFLICT (user_id, service_id) 
 		DO UPDATE SET 
-			encrypted_access_token = $4,
-			encrypted_refresh_token = $5,
+			access_token = $4,
+			refresh_token = $5,
 			token_type = $6,
 			token_expires_at = $7,
 			service_user_id = $8,
 			service_username = $9,
 			scopes = $10,
+			metadata = $11,
 			updated_at = NOW()
 	`, uuid.New().String(), userID, serviceID, encryptedAccess, encryptedRefresh,
-		tokens.TokenType, tokens.ExpiresAt, serviceUserID, serviceUsername, tokens.Scope)
+		tokens.TokenType, tokens.ExpiresAt, serviceUserID, serviceUsername, tokens.Scope, profile.Metadata)
 
 	return err
 }
@@ -324,7 +309,6 @@ func (o *OAuthManager) getUserService(userServiceID string) (*UserServiceRecord,
 
 // updateUserTokens updates encrypted tokens for a user service
 func (o *OAuthManager) updateUserTokens(userServiceID string, tokens *OAuthTokens) error {
-	// Encrypt tokens
 	encryptedAccess, encryptedRefresh, err := o.encryption.EncryptTokens(tokens.AccessToken, tokens.RefreshToken)
 	if err != nil {
 		return fmt.Errorf("failed to encrypt tokens: %w", err)

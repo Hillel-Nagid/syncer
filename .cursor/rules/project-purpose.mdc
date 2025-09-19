@@ -6,4 +6,9 @@ alwaysApply: true
 
 The app is a syncronization engine between different services such as Calendars and music streaming services.
 The app preserves the users' provacy, and doesn't store their syncronized datq persistently.
-The app should sync the users' data between different comparable services.
+The app cross-syncs the users' data between different comparable services.
+There is no meaning for syncing a service alone. It must always be paired with other services to sync with.
+There are 2 syncs modes: sync-from, sync-to
+A user can decide which direction to sync the data, enabling bidirectional syncing
+A service can be synced with multiple other services in different directions.
+A sync-job can be either running automatically in the backgroud, or manually initiated by the user.

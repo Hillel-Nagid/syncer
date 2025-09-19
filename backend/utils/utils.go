@@ -2,7 +2,7 @@ package utils
 
 import (
 	"crypto/rand"
-	"encoding/hex"
+	"encoding/base64"
 )
 
 func GenerateToken() (string, error) {
@@ -11,5 +11,5 @@ func GenerateToken() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return hex.EncodeToString(bytes), nil
+	return base64.URLEncoding.EncodeToString(bytes), nil
 }

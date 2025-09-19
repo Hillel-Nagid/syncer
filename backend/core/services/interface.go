@@ -6,7 +6,7 @@ import (
 )
 
 // ServiceProvider defines the interface that all service implementations must implement
-type ServiceProvider[T any] interface {
+type ServiceProvider interface {
 	// Metadata
 	Name() string
 	DisplayName() string
@@ -20,11 +20,11 @@ type ServiceProvider[T any] interface {
 	ValidateTokens(tokens *OAuthTokens) (bool, error)
 
 	// Data Synchronization
-	SyncUserData(ctx context.Context, tokens *OAuthTokens, lastSync time.Time) (*SyncResult[T], error)
+	GetUserData(ctx context.Context, tokens *OAuthTokens, lastSync time.Time) (*UserDataResult, error)
 	GetUserProfile(ctx context.Context, tokens *OAuthTokens) (*UserProfile, error)
 
 	// Health and Status
-	HealthCheck(ctx context.Context) error
+	HealthCheck() error
 	GetRateLimit() *RateLimit
 }
 
@@ -45,26 +45,20 @@ type OAuthTokens struct {
 	Scope        string    `json:"scope,omitempty"`
 }
 
-// SyncResult represents the result of a synchronization operation
-type SyncResult[T any] struct {
-	Success       bool           `json:"success"`
-	ItemsAdded    int            `json:"items_added"`
-	ItemsUpdated  int            `json:"items_updated"`
-	ItemsDeleted  int            `json:"items_deleted"`
-	Items         []SyncItem[T]  `json:"items"`
-	NextPageToken string         `json:"next_page_token,omitempty"`
-	Errors        []SyncError    `json:"errors,omitempty"`
-	Metadata      map[string]any `json:"metadata,omitempty"`
+// UserDataResult represents the result of a synchronization operation
+type UserDataResult struct {
+	Success  bool           `json:"success"`
+	Items    []SyncItem     `json:"items"`
+	Errors   []SyncError    `json:"errors,omitempty"`
+	Metadata map[string]any `json:"metadata,omitempty"`
 }
 
 // SyncItem represents a single item that was synchronized
-type SyncItem[T any] struct {
-	ExternalID   string     `json:"external_id"`
-	ItemType     string     `json:"item_type"`
-	Action       SyncAction `json:"action"`
-	Data         T          `json:"data"`
-	LastModified time.Time  `json:"last_modified"`
-	Checksum     string     `json:"checksum,omitempty"`
+type SyncItem struct {
+	ExternalID string     `json:"external_id"`
+	ItemType   string     `json:"item_type"`
+	Action     SyncAction `json:"action"`
+	Data       any        `json:"data"`
 }
 
 // SyncAction defines what action was performed on an item
@@ -91,7 +85,6 @@ type UserProfile struct {
 	Email       string         `json:"email,omitempty"`
 	DisplayName string         `json:"display_name,omitempty"`
 	AvatarURL   string         `json:"avatar_url,omitempty"`
-	Verified    bool           `json:"verified,omitempty"`
 	Metadata    map[string]any `json:"metadata,omitempty"`
 }
 

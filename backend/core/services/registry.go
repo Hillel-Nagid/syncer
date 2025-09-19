@@ -10,7 +10,7 @@ import (
 
 // ServiceRegistry manages all available service providers
 type ServiceRegistry struct {
-	services map[string]ServiceProvider[any]
+	services map[string]ServiceProvider
 	mu       sync.RWMutex
 	db       *sqlx.DB
 	logger   *log.Logger
@@ -23,36 +23,16 @@ func NewServiceRegistry(db *sqlx.DB, logger *log.Logger) *ServiceRegistry {
 	}
 
 	registry := &ServiceRegistry{
-		services: make(map[string]ServiceProvider[any]),
+		services: make(map[string]ServiceProvider),
 		db:       db,
 		logger:   logger,
 	}
 
-	// Auto-register all available services
-	registry.registerServices()
-
 	return registry
 }
 
-// registerServices automatically registers all available service implementations
-func (r *ServiceRegistry) registerServices() {
-	r.logger.Println("Auto-registering available services...")
-
-	// Note: Service implementations will be added in future phases
-	// This is where we'll register services like:
-	// r.Register(spotify.NewSpotifyService())
-	// r.Register(apple.NewAppleMusicService())
-	// r.Register(youtube.NewYouTubeMusicService())
-	// r.Register(tidal.NewTidalService())
-	// r.Register(deezer.NewDeezerService())
-	// r.Register(google.NewGoogleCalendarService())
-	// r.Register(outlook.NewOutlookService())
-
-	r.logger.Printf("Service registry initialized with %d services", len(r.services))
-}
-
 // Register adds a new service provider to the registry
-func (r *ServiceRegistry) Register(service ServiceProvider[any]) error {
+func (r *ServiceRegistry) Register(service ServiceProvider) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -68,7 +48,7 @@ func (r *ServiceRegistry) Register(service ServiceProvider[any]) error {
 }
 
 // GetService retrieves a service provider by name
-func (r *ServiceRegistry) GetService(name string) (ServiceProvider[any], error) {
+func (r *ServiceRegistry) GetService(name string) (ServiceProvider, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
@@ -87,12 +67,13 @@ func (r *ServiceRegistry) ListServices() []ServiceInfo {
 
 	var services []ServiceInfo
 	for _, service := range r.services {
+
 		services = append(services, ServiceInfo{
 			Name:        service.Name(),
 			DisplayName: service.DisplayName(),
 			Category:    service.Category(),
 			Scopes:      service.RequiredScopes(),
-			Available:   true, // We'll add health check logic later
+			Available:   service.HealthCheck() == nil,
 		})
 	}
 
@@ -107,12 +88,13 @@ func (r *ServiceRegistry) GetServicesByCategory(category ServiceCategory) []Serv
 	var services []ServiceInfo
 	for _, service := range r.services {
 		if service.Category() == category {
+
 			services = append(services, ServiceInfo{
 				Name:        service.Name(),
 				DisplayName: service.DisplayName(),
 				Category:    service.Category(),
 				Scopes:      service.RequiredScopes(),
-				Available:   true,
+				Available:   service.HealthCheck() == nil,
 			})
 		}
 	}
@@ -126,7 +108,7 @@ func (r *ServiceRegistry) IsServiceAvailable(name string) bool {
 	defer r.mu.RUnlock()
 
 	_, exists := r.services[name]
-	return exists
+	return exists && r.services[name].HealthCheck() == nil
 }
 
 // GetServiceCount returns the number of registered services

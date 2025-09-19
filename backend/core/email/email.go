@@ -32,7 +32,6 @@ type VerificationEmailData struct {
 }
 
 func (e *EmailService) SendVerificationEmail(ctx context.Context, data VerificationEmailData) error {
-	// Generate verification URL
 	baseURL := os.Getenv("FRONTEND_URL")
 	if baseURL == "" {
 		baseURL = "http://localhost:3000"
@@ -40,7 +39,6 @@ func (e *EmailService) SendVerificationEmail(ctx context.Context, data Verificat
 
 	verificationURL := fmt.Sprintf("%s/auth/verify?token=%s", baseURL, data.VerificationToken)
 
-	// Create HTML email content
 	htmlContent := fmt.Sprintf(`
 <!DOCTYPE html>
 <html>
@@ -151,7 +149,6 @@ func (e *EmailService) SendVerificationEmail(ctx context.Context, data Verificat
 </html>
 `, data.FullName, verificationURL, verificationURL, data.Email)
 
-	// Create plain text version
 	textContent := fmt.Sprintf(`
 Hi %s,
 
@@ -171,16 +168,14 @@ The Syncer Team
 This email was sent to %s.
 `, data.FullName, verificationURL, data.Email)
 
-	// Send email using Resend
 	params := &resend.SendEmailRequest{
-		From:    os.Getenv("RESEND_FROM_EMAIL"), // e.g., "noreply@syncer.net"
+		From:    os.Getenv("RESEND_FROM_EMAIL"),
 		To:      []string{data.Email},
 		Subject: "Verify Your Email Address - Syncer",
 		Html:    htmlContent,
 		Text:    textContent,
 	}
 
-	// Set default from email if not provided
 	if params.From == "" {
 		params.From = "noreply@syncer.net"
 	}

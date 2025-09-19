@@ -87,9 +87,14 @@ export interface ApiError {
     error: string;
 }
 
+export type ConflictResolution =
+    | 'Keep both'
+    | 'Merge when possible'
+    | 'Skip on conflict';
+
 export type ServiceInstanceSyncSettings = {
     frequency: string;
-    conflictResolution: string;
+    conflictResolution: ConflictResolution;
 };
 
 export interface ServiceInstance {

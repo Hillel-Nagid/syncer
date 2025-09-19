@@ -31,7 +31,7 @@ func (j *JWTService) GenerateTokenWithSession(user *users.User, sessionToken str
 		Email:        user.PrimaryEmail,
 		SessionToken: sessionToken,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(15 * time.Minute)), // Short-lived
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(15 * time.Minute)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			Subject:   user.ID,
 		},
@@ -39,11 +39,6 @@ func (j *JWTService) GenerateTokenWithSession(user *users.User, sessionToken str
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(j.secretKey)
-}
-
-// Legacy method for backward compatibility
-func (j *JWTService) GenerateToken(user *users.User) (string, error) {
-	return j.GenerateTokenWithSession(user, "")
 }
 
 func (j *JWTService) ValidateToken(tokenString string) (*JWTClaims, error) {

@@ -2,8 +2,16 @@ CREATE TABLE IF NOT EXISTS sync_logs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     sync_job_id UUID NOT NULL REFERENCES sync_jobs(id) ON DELETE CASCADE,
     message TEXT NOT NULL,
+    sync_type TEXT,
+    source_service TEXT,
+    target_service TEXT,
+    sync_direction TEXT CHECK (
+        sync_direction IN ('sync-from', 'sync-to', 'bidirectional')
+    ),
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
+-- Create index for service pair queries
+CREATE INDEX IF NOT EXISTS idx_sync_logs_services ON sync_logs(source_service, target_service, sync_direction);
 -- Table for storing ONLY sync metadata - NO user data content (privacy-first)
 CREATE TABLE IF NOT EXISTS sync_metadata (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -51,5 +59,11 @@ DELETE FROM pending_oauth_auth
 WHERE expires_at < NOW();
 GET DIAGNOSTICS deleted_count = ROW_COUNT;
 RETURN deleted_count;
+END;
+$$ LANGUAGE plpgsql;
+-- Add sync_logs cleanup to the sync jobs cleanup function
+CREATE OR REPLACE FUNCTION cleanup_old_sync_logs() RETURNS VOID AS $$ BEGIN
+DELETE FROM sync_logs
+WHERE created_at < NOW() - INTERVAL '30 days';
 END;
 $$ LANGUAGE plpgsql;
